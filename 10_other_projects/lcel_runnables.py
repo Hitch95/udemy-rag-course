@@ -17,13 +17,13 @@ from langchain.runnables import (
 )
 
 # Import LangChain components
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
-from langchain.document_loaders import BSHTMLLoader
+from langchain_classic.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
+from langchain_community.document_loaders import BSHTMLLoader
 
 # Configuration variables
 CHUNK_SIZE = 1000

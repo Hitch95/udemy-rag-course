@@ -2,14 +2,14 @@ import os
 import time
 import requests
 from bs4 import BeautifulSoup
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
 from langchain_core.globals import set_llm_cache
 from langchain_core.caches import InMemoryCache
-from langchain.docstore.document import Document
+from langchain_core.documents import Document
 import numpy as np
 import tempfile
 from typing import Dict, List, Tuple

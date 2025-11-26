@@ -2,23 +2,24 @@ import streamlit as st
 import os
 import requests
 from bs4 import BeautifulSoup
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.chat_models import ChatOllama
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-from langchain.docstore.document import Document
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains import RetrievalQA
+from langchain_core.documents import Document
+from langchain_core.prompts import PromptTemplate
 import numpy as np
 import time
 import tempfile
 from langchain_community.document_loaders import BSHTMLLoader
-from langchain.memory import ConversationBufferMemory
+from langchain_classic.memory import ConversationBufferMemory
 
 # Configuration variables
 CHUNK_SIZE = 300
 CHUNK_OVERLAP = 50
-MODEL_NAME = "deepseek-r1:latest"
+# MODEL_NAME = "deepseek-r1:latest"
+MODEL_NAME = "qwen3:1.7b"
 TEMPERATURE = 0.4
 
 # Initialize session state variables
@@ -74,7 +75,7 @@ def initialize_rag_pipeline(texts):
         )
         
         # Create embeddings
-        embeddings = OllamaEmbeddings(model="deepseek-r1:latest")
+        embeddings = OllamaEmbeddings(model=MODEL_NAME)
         
         # Create vector store
         vectorstore = FAISS.from_documents(texts, embeddings)

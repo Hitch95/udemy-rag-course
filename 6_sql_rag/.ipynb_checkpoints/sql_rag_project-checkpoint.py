@@ -4,10 +4,10 @@ import requests
 from bs4 import BeautifulSoup
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
 from langchain.vectorstores import SQLiteVectorStore
-from langchain.docstore.document import Document
+from langchain_core.documents import Document
 import numpy as np
 import tempfile
 from langchain_community.document_loaders import BSHTMLLoader

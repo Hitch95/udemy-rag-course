@@ -1,24 +1,27 @@
 import os
 import numpy as np
-from langchain.document_loaders import CSVLoader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_community.document_loaders import CSVLoader
+from langchain_text_splitters import CharacterTextSplitter
+# from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import ChatOllama
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
 
 # Configuration variables
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 100
 MAX_TOKENS = 150
-MODEL_NAME = "gpt-4o-mini"  # You can change this to "gpt-4" if you have access
+# MODEL_NAME = "gpt-4o-mini"
+MODEL_NAME = "qwen3:1.7b"
 TEMPERATURE = 0.4
 
 # Set up OpenAI API key
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    OPENAI_API_KEY = input("Please enter your OpenAI API key: ")
-    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+# OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+# if not OPENAI_API_KEY:
+#     OPENAI_API_KEY = input("Please enter your OpenAI API key: ")
+#     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 def load_csv_data(file_path):
     loader = CSVLoader(file_path=file_path)
@@ -31,7 +34,8 @@ def create_embeddings(documents):
     texts = text_splitter.split_documents(documents)
     print(f"Split into {len(texts)} chunks")
 
-    embeddings = OpenAIEmbeddings()
+    # embeddings = OpenAIEmbeddings()
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     
     # Print sample embedding
     if texts:
@@ -50,10 +54,14 @@ def create_vectorstore(texts, embeddings):
     return vectorstore
 
 def setup_qa_chain(vectorstore):
-    llm = ChatOpenAI(
-        model_name=MODEL_NAME,
+    # llm = ChatOpenAI(
+    #     model_name=MODEL_NAME,
+    #     temperature=TEMPERATURE,
+    #     max_tokens=MAX_TOKENS
+    # )
+    llm = ChatOllama(
+        model=MODEL_NAME,
         temperature=TEMPERATURE,
-        max_tokens=MAX_TOKENS
     )
 
     template = """Use the following pieces of context to answer the question at the end. 

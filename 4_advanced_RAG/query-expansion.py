@@ -1,9 +1,10 @@
 import os
 from typing import List
-from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain.output_parsers import PydanticToolsParser
+from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticToolsParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 
 class ParaphrasedQuery(BaseModel):
     """You have performed query expansion to generate a paraphrasing of a question."""
@@ -19,10 +20,10 @@ class QueryExpander:
     def __init__(self, api_key: str = None):
         """Initialize the QueryExpander with necessary components."""
         # Set up OpenAI API key
-        if api_key:
-            os.environ["OPENAI_API_KEY"] = api_key
-        elif not os.getenv("OPENAI_API_KEY"):
-            raise ValueError("No API key provided. Set OPENAI_API_KEY environment variable or pass key to constructor.")
+        # if api_key:
+        #     os.environ["OPENAI_API_KEY"] = api_key
+        # elif not os.getenv("OPENAI_API_KEY"):
+        #     raise ValueError("No API key provided. Set OPENAI_API_KEY environment variable or pass key to constructor.")
         
         # Define the system prompt
         self.system_prompt = """You are an expert at expanding user questions into multiple variations. \
@@ -41,8 +42,12 @@ class QueryExpander:
         ])
         
         # Initialize the language model
-        self.llm = ChatOpenAI(
-            model="gpt-4o-mini",
+        # self.llm = ChatOpenAI(
+        #     model="gpt-4o-mini",
+        #     temperature=0
+        # )
+        self.llm = ChatOllama(
+            model="qwen3:1.7b", # Ensure you have pulled this model: ollama pull qwen3:1.7b
             temperature=0
         )
         

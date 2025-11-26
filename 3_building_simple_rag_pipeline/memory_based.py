@@ -1,28 +1,32 @@
 import os
 import bs4
 import requests
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+# from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import ChatOllama
 from langchain_community.vectorstores import FAISS
-from langchain.chains import ConversationalRetrievalChain
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains import ConversationalRetrievalChain
+from langchain_core.prompts import PromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain.memory import ConversationBufferMemory
+from langchain_classic.memory import ConversationBufferMemory
 
 # Configuration
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    OPENAI_API_KEY = input("Please enter your OpenAI API key: ")
-    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+# OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+# if not OPENAI_API_KEY:
+#     OPENAI_API_KEY = input("Please enter your OpenAI API key: ")
+#     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 WEBSITE_URL = "https://www.snapy.ai/"
 
 # Initialize OpenAI components
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.4)
-embeddings = OpenAIEmbeddings()
+# llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.4)
+# embeddings = OpenAIEmbeddings()
+llm = ChatOllama(model="qwen3:1.7b", temperature=0.4)
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 def fetch_website_content(url):
     try:

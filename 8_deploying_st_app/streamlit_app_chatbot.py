@@ -3,11 +3,11 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
 import numpy as np
 import tempfile
 from langchain_community.document_loaders import BSHTMLLoader

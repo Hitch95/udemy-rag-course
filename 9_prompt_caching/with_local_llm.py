@@ -2,7 +2,8 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_anthropic import ChatAnthropic, AnthropicEmbeddings
+from langchain_ollama import ChatOllama
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_classic.chains import RetrievalQA
 from langchain_core.prompts import PromptTemplate
@@ -18,18 +19,12 @@ CHUNK_OVERLAP = 100
 MAX_TOKENS = 15000
 TEMPERATURE = 0.4
 
-# Set up Anthropic API key
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-if not ANTHROPIC_API_KEY:
-    ANTHROPIC_API_KEY = input("Please enter your Anthropic API key: ")
-    os.environ["ANTHROPIC_API_KEY"] = ANTHROPIC_API_KEY
-
 # Set up the cache
 set_llm_cache(InMemoryCache())
 
-# Set up Anthropic language model
-llm = ChatAnthropic(
-    model="claude-3-opus-20240229",
+# Set up Ollama language model
+llm = ChatOllama(
+    model="qwen3:1.7b",
     temperature=TEMPERATURE,
     max_tokens_to_sample=MAX_TOKENS
 )
@@ -139,7 +134,7 @@ if __name__ == "__main__":
                 continue
             
             print("Creating embeddings and vector store...")
-            embeddings = AnthropicEmbeddings()
+            embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
             
             print_sample_embeddings(texts, embeddings)
             

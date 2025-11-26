@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 # Let's create simple 2D embeddings for a few words
 word_embeddings = {
@@ -22,7 +23,12 @@ plt.xlabel("Dimension 1")
 plt.ylabel("Dimension 2")
 plt.legend()
 plt.grid(True)
-plt.show()
+# plt.show()
+
+# Sauvegarder l'image et l'ouvrir
+output_path = os.path.join(os.path.dirname(__file__), "embeddings_plot.png")
+plt.savefig(output_path, dpi=150, bbox_inches='tight')
+print(f"Graphique sauvegardé : {output_path}")
 
 # Print out the embeddings
 for word, embedding in word_embeddings.items():

@@ -1,14 +1,16 @@
-import os
+# import os
 from dotenv import load_dotenv
 import gradio as gr
 from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_text_splitters import CharacterTextSplitter
+# from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import ChatOllama
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA, LLMChain
-from langchain.prompts import PromptTemplate
-import pymupdf as fitz  # Changed import
-import pytesseract
+from langchain_classic.chains import RetrievalQA, LLMChain
+from langchain_core.prompts import PromptTemplate
+import pymupdf as fitz
+# import pytesseract
 from PIL import Image
 import io
 import pandas as pd
@@ -20,18 +22,18 @@ load_dotenv()
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 100
 MAX_TOKENS = 4096
-MODEL_NAME = "gpt-4o-mini"
+# MODEL_NAME = "gpt-4o-mini"
+MODEL_NAME = "qwen3:1.7b"
 TEMPERATURE = 0.4
 
 # Get OpenAI API key from environment variable
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-if not OPENAI_API_KEY:
-    raise ValueError("Please set OPENAI_API_KEY in your .env file")
+# OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# if not OPENAI_API_KEY:
+#     raise ValueError("Please set OPENAI_API_KEY in your .env file")
 
 # Initialize LLM
-llm = ChatOpenAI(
-    api_key=OPENAI_API_KEY,
-    model_name=MODEL_NAME,
+llm = ChatOllama(
+    model=MODEL_NAME,
     temperature=TEMPERATURE,
     max_tokens=MAX_TOKENS
 )
@@ -53,10 +55,20 @@ def process_pdf(pdf_file):
     pdf_reader = PdfReader(pdf_file)
     text = ""
     for page in pdf_reader.pages:
-        text += page.extract_text()
+        page_text = page.extract_text()
+        if page_text:
+            text += page_text
+    
+    # Si aucun texte n'est extrait, retourner un message par défaut
+    if not text.strip():
+        return ["Ce PDF ne contient pas de texte extractible. Il s'agit peut-être d'un PDF scanné ou contenant uniquement des images."]
     
     text_splitter = CharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
     texts = text_splitter.split_text(text)
+    
+    # S'assurer qu'on a au moins un chunk
+    if not texts:
+        return ["Aucun texte n'a pu être extrait de ce PDF."]
     
     return texts
 
@@ -86,11 +98,11 @@ def extract_images_and_tables(pdf_file):
 
 def create_embeddings_and_vectorstore(texts):
     """Create embeddings and vector store from text chunks."""
-    embeddings = OpenAIEmbeddings()
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     vectorstore = FAISS.from_texts(texts, embeddings)
     return vectorstore
 
-def expand_query(query: str, llm: ChatOpenAI) -> str:
+def expand_query(query: str, llm: ChatOllama) -> str:
     """Expand the original query with related terms."""
     prompt = PromptTemplate(
         input_variables=["query"],

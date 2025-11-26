@@ -1,31 +1,34 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_text_splitters import CharacterTextSplitter
+# from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import ChatOllama
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-from langchain.docstore.document import Document
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains import RetrievalQA
+from langchain_core.documents import Document
+from langchain_core.prompts import PromptTemplate
 import numpy as np
 import time
 import random
 import tempfile
 from langchain_community.document_loaders import BSHTMLLoader
-from langchain.memory import ConversationBufferMemory
+from langchain_classic.memory import ConversationBufferMemory
 
 # Configuration variables
 CHUNK_SIZE = 300
 CHUNK_OVERLAP = 50
 MAX_TOKENS = 15000
-MODEL_NAME = "gpt-4o-mini"
+# MODEL_NAME = "gpt-4o-mini"
+MODEL_NAME = "qwen3:1.7b"
 TEMPERATURE = 0.4
 
 # Set up OpenAI API key
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    OPENAI_API_KEY = input("Please enter your OpenAI API key: ")
-    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+# OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+# if not OPENAI_API_KEY:
+#     OPENAI_API_KEY = input("Please enter your OpenAI API key: ")
+#     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 def scrape_website(url):
     headers = {
@@ -125,10 +128,14 @@ def print_sample_embeddings(texts, embeddings):
         print("No texts available for embedding sample.")
 
 # Set up OpenAI language model
-llm = ChatOpenAI(
-    model_name=MODEL_NAME,
+# llm = ChatOpenAI(
+#     model_name=MODEL_NAME,
+#     temperature=TEMPERATURE,
+#     max_tokens=MAX_TOKENS
+# )
+llm = ChatOllama(
+    model=MODEL_NAME,
     temperature=TEMPERATURE,
-    max_tokens=MAX_TOKENS
 )
 
 # Set up the retrieval-based QA system with a simplified prompt template
@@ -185,7 +192,8 @@ if __name__ == "__main__":
                 continue
             
             print("Creating embeddings and vector store...")
-            embeddings = OpenAIEmbeddings()
+            # embeddings = OpenAIEmbeddings()
+            embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
             
             print_sample_embeddings(texts, embeddings)
             
